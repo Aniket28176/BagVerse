@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ Global Premium Styles ============ */
+@layer base {
+  * {
+    @apply scroll-smooth;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-inter bg-white text-gray-900;
+    font-family: 'Inter', sans-serif;
+    background-color: #fafaf8;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+
+  h1, h2, h3 {
+    @apply font-poppins font-bold;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.5px;
+  }
+
+  h4, h5, h6 {
+    @apply font-poppins font-semibold;
+    letter-spacing: -0.3px;
+  }
+
+  button {
+    @apply transition-all duration-300 ease-in-out;
+    font-family: 'Inter', sans-serif;
+  }
+
+  a {
+    @apply transition-colors duration-300;
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-yellow-200 text-gray-900;
+  }
+}
+
+/* ============ Premium Components ============ */
+@layer components {
+  /* Premium Buttons */
+  .btn-luxury {
+    @apply px-8 py-3.5 bg-black text-white rounded-none font-semibold tracking-widest uppercase text-xs hover:bg-gray-900 active:scale-95 transition-all duration-300;
+  }
+
+  .btn-luxury-outline {
+    @apply px-8 py-3.5 border-2 border-black text-black rounded-none font-semibold tracking-widest uppercase text-xs hover:bg-black hover:text-white transition-all duration-300;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-yellow-100 text-yellow-900 border border-yellow-200 rounded-lg font-medium hover:bg-yellow-200 transition-all duration-300;
+  }
+
+  /* Premium Cards */
+  .card-luxury {
+    @apply bg-white rounded-none shadow-sm hover:shadow-md transition-shadow duration-500;
+  }
+
+  .card-shadow {
+    @apply shadow-sm hover:shadow-lg transition-shadow duration-500;
+  }
+
+  /* Premium Links */
+  .link-luxury {
+    @apply text-gray-900 font-medium hover:text-yellow-600 transition-colors duration-300 relative;
+  }
+
+  .link-luxury::after {
+    content: '';
+    @apply absolute left-0 bottom-0 w-0 h-0.5 bg-yellow-600 transition-all duration-300;
+  }
+
+  .link-luxury:hover::after {
+    @apply w-full;
+  }
+
+  /* Premium Badge */
+  .badge-luxury {
+    @apply inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-none uppercase tracking-wider;
+  }
+
+  /* Premium Input */
+  .input-luxury {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-none bg-white focus:outline-none focus:ring-1 focus:ring-yellow-600 focus:border-transparent transition-all duration-300;
+  }
+}
+
+/* ============ Premium Animations ============ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: -1000px 0;
+  }
+  50% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes luxuryGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(201, 169, 97, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(201, 169, 97, 0.1);
+  }
+}
+
+@keyframes floatUp {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@layer utilities {
+  /* Premium Animation Classes */
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .animate-fadeInDown {
+    animation: fadeInDown 0.6s ease-out;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slideInLeft {
+    animation: slideInFromLeft 0.7s ease-out;
+  }
+
+  .animate-slideInRight {
+    animation: slideInFromRight 0.7s ease-out;
+  }
+
+  .animate-scaleUp {
+    animation: scaleUp 0.5s ease-out;
+  }
+
+  .animate-scaleDown {
+    animation: scaleDown 0.5s ease-out;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e8e8e8 50%,
+      #f0f0f0 75%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-slideInFromTop {
+    animation: slideInFromTop 0.7s ease-out;
+  }
+
+  .animate-luxuryGlow {
+    animation: luxuryGlow 3s ease-in-out infinite;
+  }
+
+  .animate-floatUp {
+    animation: floatUp 3s ease-in-out infinite;
+  }
+
+  /* Stagger animations */
+  .stagger-1 {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-2 {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-3 {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-4 {
+    animation-delay: 0.4s;
+  }
+
+  .stagger-5 {
+    animation-delay: 0.5s;
+  }
+
+  /* Smooth scrolling for sections */
+  .scroll-smooth-slow {
+    scroll-behavior: smooth;
+  }
+
+  /* Premium hover effects */
+  .hover-lift {
+    @apply hover:-translate-y-1 transition-transform duration-300;
+  }
+
+  .hover-scale {
+    @apply hover:scale-105 transition-transform duration-300;
+  }
+
+  .hover-shadow-lg {
+    @apply hover:shadow-xl transition-shadow duration-300;
+  }
+}
