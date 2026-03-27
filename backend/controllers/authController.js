@@ -29,31 +29,25 @@ module.exports.registerUser = async function (req, res) {
       fullname,
     });
 
-    // 🔥 RESET & CREATE SESSION (IMPORTANT)
-    req.session.regenerate((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Session error" });
-      }
+    // ✅ SIMPLE SESSION SET
+    req.session.user = {
+      _id: user._id,
+      email: user.email,
+      role: "user",
+    };
 
-      req.session.user = {
-        _id: user._id,          // ✅ MUST be _id
+    return res.status(201).json({
+      message: "Account created successfully",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
         email: user.email,
-        role: "user",           // ✅ REQUIRED
-      };
-
-      return res.status(201).json({
-        message: "Account created successfully",
-        user: {
-          _id: user._id,
-          fullname: user.fullname,
-          email: user.email,
-          role: "user",
-        },
-      });
+        role: "user",
+      },
     });
 
   } catch (err) {
-    console.error("Register error:", err);
+    console.error("🔥 Register error:", err);
     return res.status(500).json({
       message: "Error creating user",
     });
@@ -87,31 +81,25 @@ module.exports.loginUser = async function (req, res) {
       });
     }
 
-    // 🔥 RESET & CREATE SESSION (IMPORTANT)
-    req.session.regenerate((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Session error" });
-      }
+    // ✅ SESSION SET (NO regenerate)
+    req.session.user = {
+      _id: user._id,
+      email: user.email,
+      role: "user",
+    };
 
-      req.session.user = {
-        _id: user._id,          // ✅ MUST be _id
+    return res.status(200).json({
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
         email: user.email,
-        role: "user",           // ✅ REQUIRED
-      };
-
-      return res.status(200).json({
-        message: "Login successful",
-        user: {
-          _id: user._id,
-          fullname: user.fullname,
-          email: user.email,
-          role: "user",
-        },
-      });
+        role: "user",
+      },
     });
 
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("🔥 Login error:", err);
     return res.status(500).json({
       message: "Login failed",
     });
@@ -129,8 +117,12 @@ module.exports.logout = function (req, res) {
       });
     }
 
-    // 🔥 MUST MATCH app.js
-    res.clearCookie("admin.sid");
+    // ✅ MATCH app.js cookie name
+    res.clearCookie("baggista.sid", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
 
     return res.status(200).json({
       message: "Logged out successfully",
