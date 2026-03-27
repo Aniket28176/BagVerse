@@ -17,17 +17,28 @@ const ordersRouter = require("./routes/ordersRouter");
 const app = express();
 
 /* ===============================
-   CORS
+   CORS (FIXED ✅)
    =============================== */
-const rawFrontendUrls = process.env.FRONTEND_URL || "";
-const additionalOrigins = process.env.ADDITIONAL_ORIGINS || ""; // format: "https://a.vercel.app,https://b.vercel.app"
-
+const allowedOrigins = [
+  "https://bag-verse-brown.vercel.app",
+  "http://localhost:5173"
+];
 
 app.use(cors({
-  origin: [
-    "https://bag-verse-brown.vercel.app",
-    "http://localhost:5173"
-  ],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+// ✅ VERY IMPORTANT (handles preflight requests)
+app.options("*", cors({
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -39,7 +50,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 /* ===============================
-   SESSION (CORRECT for connect-mongo v5+)
+   SESSION (FIXED FOR CROSS-ORIGIN ✅)
    =============================== */
 app.use(
   session({
@@ -55,9 +66,9 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === 'production', // set true only when HTTPS
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: "none",   // 🔥 REQUIRED for cross-origin
+      secure: true,       // 🔥 REQUIRED (HTTPS on Render)
+      maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
