@@ -16,9 +16,7 @@ const ordersRouter = require("./routes/ordersRouter");
 
 const app = express();
 
-/* ===============================
-   CORS (FIXED ✅)
-   =============================== */
+
 const allowedOrigins = [
   "https://bag-verse-brown.vercel.app",
   "http://localhost:5173"
@@ -36,22 +34,12 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ VERY IMPORTANT (handles preflight requests)
-app.options("/*", cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
 
-/* ===============================
-   BODY PARSERS
-   =============================== */
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
-/* ===============================
-   SESSION (FIXED FOR CROSS-ORIGIN ✅)
-   =============================== */
+
 app.use(
   session({
     name: "baggista.sid",
@@ -73,23 +61,15 @@ app.use(
   })
 );
 
-/* ===============================
-   STATIC FILES
-   =============================== */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ===============================
-   ROUTES
-   =============================== */
+
 app.use("/api/owners", ownersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/orders", ordersRouter);
 
-/* ===============================
-   HEALTH CHECK
-   =============================== */
 app.get("/", (req, res) => {
   res.json({
     status: "Backend running successfully 🚀",
@@ -97,9 +77,6 @@ app.get("/", (req, res) => {
   });
 });
 
-/* ===============================
-   GLOBAL ERROR HANDLER
-   =============================== */
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err);
   res.status(500).json({ error: "Internal Server Error" });
