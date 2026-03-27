@@ -1,10 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "./utils/api";
 
-/* ===============================
-   USER PAGES
-   =============================== */
+/* USER PAGES */
 import Shop from "./pages/Shop";
 import BuyNow from "./pages/BuyNow";
 import Cart from "./pages/Cart";
@@ -13,9 +10,7 @@ import Account from "./pages/Account";
 import PlaceOrder from "./pages/PlaceOrder";
 import OrderSuccess from "./pages/OrderSuccess";
 
-/* ===============================
-   ADMIN PAGES
-   =============================== */
+/* ADMIN */
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -23,182 +18,72 @@ import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
 
 /* ===============================
-   USER PRIVATE ROUTE
+   USER PROTECTED
    =============================== */
 const UserPrivateRoute = ({ children }) => {
-  const [isAuth, setIsAuth] = useState(null);
+  const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    const checkUserAuth = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/check-auth`,
-          { credentials: "include" }
-        );
-        setIsAuth(res.ok);
-      } catch (err) {
-        setIsAuth(false);
-      }
-    };
-
-    checkUserAuth();
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setAuth(data.user?.role === "user");
+      })
+      .catch(() => setAuth(false));
   }, []);
 
-  if (isAuth === null) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Checking user authentication...
-      </div>
-    );
-  }
-
-  return isAuth ? children : <Navigate to="/auth" replace />;
+  if (auth === null) return <div>Loading...</div>;
+  return auth ? children : <Navigate to="/auth" />;
 };
 
 /* ===============================
-   ADMIN PRIVATE ROUTE
+   ADMIN PROTECTED
    =============================== */
 const AdminPrivateRoute = ({ children }) => {
-  const [isAuth, setIsAuth] = useState(null);
+  const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    const checkAdminAuth = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/owners/check-auth`,
-          { credentials: "include" }
-        );
-        setIsAuth(res.ok);
-      } catch (err) {
-        setIsAuth(false);
-      }
-    };
-
-    checkAdminAuth();
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setAuth(data.user?.role === "admin");
+      })
+      .catch(() => setAuth(false));
   }, []);
 
-  if (isAuth === null) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Checking admin access...
-      </div>
-    );
-  }
-
-  return isAuth ? children : <Navigate to="/admin/login" replace />;
+  if (auth === null) return <div>Loading...</div>;
+  return auth ? children : <Navigate to="/admin/login" />;
 };
 
 /* ===============================
-   APP ROUTES
+   ROUTES
    =============================== */
 const App = () => {
   return (
     <Router>
       <Routes>
 
-        {/* -------- USER ROUTES -------- */}
-        <Route
-          path="/"
-          element={
-            <UserPrivateRoute>
-              <Shop />
-            </UserPrivateRoute>
-          }
-        />
-        <Route
-          path="/shop"
-          element={
-            <UserPrivateRoute>
-              <Shop />
-            </UserPrivateRoute>
-          }
-        />
-        <Route
-          path="/account"
-          element={
-            <UserPrivateRoute>
-              <Account />
-            </UserPrivateRoute>
-          }
-        />
-        <Route
-          path="/buynow/:id"
-          element={
-            <UserPrivateRoute>
-              <BuyNow />
-            </UserPrivateRoute>
-          }
-        />
-        <Route
-          path="/cart"
-          element={
-            <UserPrivateRoute>
-              <Cart />
-            </UserPrivateRoute>
-          }
-        />
-        <Route
-          path="/place-order"
-          element={
-            <UserPrivateRoute>
-              <PlaceOrder />
-            </UserPrivateRoute>
-          }
-        />
+        {/* USER */}
+        <Route path="/" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
+        <Route path="/shop" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
+        <Route path="/cart" element={<UserPrivateRoute><Cart /></UserPrivateRoute>} />
+        <Route path="/account" element={<UserPrivateRoute><Account /></UserPrivateRoute>} />
+        <Route path="/buynow/:id" element={<UserPrivateRoute><BuyNow /></UserPrivateRoute>} />
+        <Route path="/place-order" element={<UserPrivateRoute><PlaceOrder /></UserPrivateRoute>} />
+        <Route path="/order-success" element={<UserPrivateRoute><OrderSuccess /></UserPrivateRoute>} />
 
-        <Route
-           path="/order-success"
-           element={
-           <UserPrivateRoute>
-            <OrderSuccess />
-          </UserPrivateRoute>
-        }
-        />
-
-
-        {/* Public user auth */}
         <Route path="/auth" element={<Auth />} />
 
-        {/* -------- ADMIN ROUTES -------- */}
+        {/* ADMIN */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/signup" element={<AdminSignup />} />
-
-        <Route
-          path="/admin/dashboard"
-          element={
-            <AdminPrivateRoute>
-              <AdminDashboard />
-            </AdminPrivateRoute>
-          }
-        />
-
-        <Route
-          path="/admin/products"
-          element={
-            <AdminPrivateRoute>
-              <AdminProducts />
-            </AdminPrivateRoute>
-          }
-        />
-
-        <Route
-          path="/admin/products/create"
-          element={
-            <AdminPrivateRoute>
-              <CreateProduct />
-            </AdminPrivateRoute>
-          }
-        />
-
-        {/* -------- 404 -------- */}
-        <Route
-          path="*"
-          element={
-            <div className="h-screen flex items-center justify-center text-xl">
-              404 | Page Not Found
-            </div>
-          }
-        />
+        <Route path="/admin/dashboard" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
+        <Route path="/admin/products" element={<AdminPrivateRoute><AdminProducts /></AdminPrivateRoute>} />
+        <Route path="/admin/products/create" element={<AdminPrivateRoute><CreateProduct /></AdminPrivateRoute>} />
 
       </Routes>
     </Router>

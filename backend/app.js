@@ -17,14 +17,22 @@ const ordersRouter = require("./routes/ordersRouter");
 const app = express();
 
 /* ===============================
-   CORS (ALLOW ALL ORIGINS SAFELY)
+   🔥 TRUST PROXY (CRITICAL FIX)
+   =============================== */
+app.set("trust proxy", 1);
+
+/* ===============================
+   CORS
    =============================== */
 const corsOptions = {
-  origin: true, // 🔥 allows all origins dynamically
+  origin: [
+    "http://localhost:5173",
+    "https://bag-verse-brown.vercel.app", // 🔥 PUT YOUR REAL URL
+  ],
   credentials: true,
 };
 
-app.use(cors(corsOptions)); // ✅ preflight handled automatically
+app.use(cors(corsOptions));
 
 /* ===============================
    MIDDLEWARE
@@ -50,17 +58,12 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      sameSite: "none", // 🔥 required for cross-origin cookies
-      secure: true,     // 🔥 required for HTTPS (Render)
+      sameSite: "none",
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
-
-/* ===============================
-   STATIC
-   =============================== */
-app.use(express.static(path.join(__dirname, "public")));
 
 /* ===============================
    ROUTES
@@ -73,22 +76,8 @@ app.use("/api/orders", ordersRouter);
 
 app.get("/", (req, res) => {
   res.json({
-    status: "Backend running successfully 🚀",
+    status: "Backend running 🚀",
     loggedIn: !!req.session.user,
-  });
-});
-
-/* ===============================
-   ERROR HANDLER (CORS SAFE)
-   =============================== */
-app.use((err, req, res, next) => {
-  console.error("🔥 Server Error:", err);
-
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  res.status(500).json({
-    error: err.message || "Internal Server Error",
   });
 });
 
@@ -98,5 +87,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server started at http://localhost:${PORT}`);
+  console.log(`✅ Server running on ${PORT}`);
 });

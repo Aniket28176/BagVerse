@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 
 const CreateProduct = () => {
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -14,8 +16,13 @@ const CreateProduct = () => {
     panelcolor: "",
     textcolor: "",
   });
-  const [image, setImage] = useState(null);
 
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  /* ===============================
+     HANDLE INPUT
+     =============================== */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,29 +30,42 @@ const CreateProduct = () => {
     });
   };
 
+  /* ===============================
+     HANDLE SUBMIT
+     =============================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!image) {
+      return setError("Please upload an image");
+    }
+
+    setLoading(true);
 
     try {
       const data = new FormData();
+
       Object.keys(formData).forEach((key) => {
         data.append(key, formData[key]);
       });
+
       data.append("image", image);
 
       await axios.post(
-  "${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/products/create",
-  data,
-  {
-    withCredentials: true, // 🔥 THIS FIXES 401
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  }
-);
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/products/create`,
+        data,
+        {
+          withCredentials: true, // 🔥 REQUIRED
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
+      setSuccess("✅ Product created successfully!");
 
-      setSuccess("Product created successfully!");
       setFormData({
         name: "",
         price: "",
@@ -54,9 +74,15 @@ const CreateProduct = () => {
         panelcolor: "",
         textcolor: "",
       });
+
       setImage(null);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError(
+        err.response?.data?.message || "❌ Failed to create product"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,120 +90,115 @@ const CreateProduct = () => {
     <>
       <Navbar loggedIn={true} isAdmin={true} />
 
-
+      {/* SUCCESS */}
       {success && (
-        <div className="absolute top-5 left-1/2 -translate-x-1/2 p-3 rounded-md bg-blue-500">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-green-500 px-5 py-3 rounded-md shadow-lg z-50">
           <span className="text-white">{success}</span>
+        </div>
+      )}
+
+      {/* ERROR */}
+      {error && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-red-500 px-5 py-3 rounded-md shadow-lg z-50">
+          <span className="text-white">{error}</span>
         </div>
       )}
 
       <div className="min-h-screen flex flex-col">
         <div className="container px-10 py-20 flex flex-grow">
 
-          {/* Sidebar */}
+          {/* SIDEBAR */}
           <div className="w-[25%] flex flex-col">
             <Link className="mb-2" to="/admin/products">
               All Products
             </Link>
             <Link className="mb-2" to="/admin/products/create">
-              Create new product
+              Create Product
             </Link>
           </div>
 
-          {/* Main */}
+          {/* MAIN */}
           <main className="w-3/4 bg-white p-8 shadow ml-4">
             <h2 className="text-xl font-bold mb-4">
               Create New Product
             </h2>
 
             <form onSubmit={handleSubmit} autoComplete="off">
-              {/* Product Details */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">
-                  Product Details
-                </h3>
 
-                <div className="mb-4">
-                  <label className="block mb-2 font-medium">
-                    Product Image
-                  </label>
-                  <input
-                    type="file"
-                    onChange={(e) => setImage(e.target.files[0])}
-                    className="py-2 px-4 rounded"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Product Name"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <input
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    type="number"
-                    placeholder="Product Price"
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <input
-                    name="discount"
-                    value={formData.discount}
-                    onChange={handleChange}
-                    type="number"
-                    placeholder="Discount Price"
-                    className="border p-2 rounded"
-                  />
-                </div>
+              {/* IMAGE */}
+              <div className="mb-4">
+                <label className="block mb-2 font-medium">
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  required
+                />
               </div>
 
-              {/* Panel Details */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">
-                  Panel Details
-                </h3>
+              {/* INPUTS */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Product Name"
+                  className="border p-2 rounded"
+                  required
+                />
+                <input
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  type="number"
+                  placeholder="Price"
+                  className="border p-2 rounded"
+                  required
+                />
+                <input
+                  name="discount"
+                  value={formData.discount}
+                  onChange={handleChange}
+                  type="number"
+                  placeholder="Discount"
+                  className="border p-2 rounded"
+                />
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    name="bgcolor"
-                    value={formData.bgcolor}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Background Color"
-                    className="border p-2 rounded"
-                  />
-                  <input
-                    name="panelcolor"
-                    value={formData.panelcolor}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Panel Color"
-                    className="border p-2 rounded"
-                  />
-                  <input
-                    name="textcolor"
-                    value={formData.textcolor}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Text Color"
-                    className="border p-2 rounded"
-                  />
-                </div>
+              {/* COLORS */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <input
+                  name="bgcolor"
+                  value={formData.bgcolor}
+                  onChange={handleChange}
+                  placeholder="Background Color"
+                  className="border p-2 rounded"
+                />
+                <input
+                  name="panelcolor"
+                  value={formData.panelcolor}
+                  onChange={handleChange}
+                  placeholder="Panel Color"
+                  className="border p-2 rounded"
+                />
+                <input
+                  name="textcolor"
+                  value={formData.textcolor}
+                  onChange={handleChange}
+                  placeholder="Text Color"
+                  className="border p-2 rounded"
+                />
               </div>
 
               <button
                 type="submit"
-                className="px-5 py-2 rounded bg-blue-500 text-white"
+                disabled={loading}
+                className={`px-6 py-3 text-white rounded ${
+                  loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
+                }`}
               >
-                Create New Product
+                {loading ? "Creating..." : "Create Product"}
               </button>
             </form>
           </main>
