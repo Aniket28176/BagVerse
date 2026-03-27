@@ -16,30 +16,27 @@ const ordersRouter = require("./routes/ordersRouter");
 
 const app = express();
 
+/* ===============================
+   CORS (ALLOW ALL ORIGINS SAFELY)
+   =============================== */
+const corsOptions = {
+  origin: true, // 🔥 allow all origins dynamically
+  credentials: true,
+};
 
-const allowedOrigins = [
-  "https://bag-verse-brown.vercel.app",
-  "http://localhost:5173"
-];
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 🔥 handle preflight
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
-
-
+/* ===============================
+   MIDDLEWARE
+   =============================== */
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
-
+/* ===============================
+   SESSION
+   =============================== */
 app.use(
   session({
     name: "baggista.sid",
@@ -54,16 +51,21 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      sameSite: "none",   // 🔥 REQUIRED for cross-origin
-      secure: true,       // 🔥 REQUIRED (HTTPS on Render)
+      sameSite: "none", // 🔥 required for cross-origin
+      secure: true,     // 🔥 required (HTTPS)
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
 
+/* ===============================
+   STATIC
+   =============================== */
 app.use(express.static(path.join(__dirname, "public")));
 
-
+/* ===============================
+   ROUTES
+   =============================== */
 app.use("/api/owners", ownersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/products", productsRouter);
@@ -77,9 +79,19 @@ app.get("/", (req, res) => {
   });
 });
 
+/* ===============================
+   ERROR HANDLER (FIXED CORS)
+   =============================== */
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
+
+  // 🔥 ensure CORS headers even on error
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  res.status(500).json({
+    error: err.message || "Internal Server Error",
+  });
 });
 
 /* ===============================
