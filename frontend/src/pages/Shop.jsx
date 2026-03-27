@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
@@ -25,11 +25,11 @@ const Shop = () => {
 
       try {
         // include search term when present
-        let url = `http://localhost:5000/api/products?sort=${sortBy}`;
+        let url = `/api/products?sort=${sortBy}`;
         if (searchTerm) {
           url += `&search=${encodeURIComponent(searchTerm)}`;
         }
-        const res = await axios.get(url);
+        const res = await api.get(url);
 
         // ✅ Defensive check
         const productList = Array.isArray(res.data.products)

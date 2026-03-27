@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CartItem from "../components/CartItem";
@@ -16,12 +16,13 @@ const Cart = () => {
 
   const fetchCart = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cart", {
-        withCredentials: true,
-      });
-      setCart(res.data || []);
+      const res = await api.get("/api/cart");
+      // Ensure we always set an array
+      const cartData = Array.isArray(res.data) ? res.data : [];
+      setCart(cartData);
     } catch (err) {
-      console.log(err);
+      console.log("Cart fetch error:", err);
+      // Ensure cart is always an array even on error
       setCart([]);
     } finally {
       setLoading(false);
@@ -83,7 +84,7 @@ const Cart = () => {
                 <div className="lg:col-span-2">
                   <div className="bg-gray-800 border border-gray-700 p-8">
                     <div className="space-y-6">
-                      {cart.map((item, idx) => (
+                      {Array.isArray(cart) && cart.map((item, idx) => (
                         <div key={item._id} className="animate-fadeInUp" style={{ animationDelay: `${100 + idx * 50}ms` }}>
                           <CartItem item={item} onCartUpdate={fetchCart} />
                         </div>

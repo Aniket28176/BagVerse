@@ -34,7 +34,7 @@ const CreateProduct = () => {
       data.append("image", image);
 
       await axios.post(
-  "http://localhost:5000/api/products/create",
+  "${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/products/create",
   data,
   {
     withCredentials: true, // 🔥 THIS FIXES 401

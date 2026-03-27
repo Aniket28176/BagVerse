@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "./utils/api";
 
 /* ===============================
    USER PAGES
@@ -31,7 +32,7 @@ const UserPrivateRoute = ({ children }) => {
     const checkUserAuth = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/users/check-auth",
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/check-auth`,
           { credentials: "include" }
         );
         setIsAuth(res.ok);
@@ -64,7 +65,7 @@ const AdminPrivateRoute = ({ children }) => {
     const checkAdminAuth = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/owners/check-auth",
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/owners/check-auth`,
           { credentials: "include" }
         );
         setIsAuth(res.ok);

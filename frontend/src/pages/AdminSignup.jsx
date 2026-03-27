@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -21,11 +21,7 @@ const AdminSignup = () => {
     setSuccess("");
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/owners/create",
-        formData,
-        { withCredentials: true }
-      );
+      await api.post("/api/owners/create", formData);
 
       setSuccess("Admin account created. You can now log in.");
 

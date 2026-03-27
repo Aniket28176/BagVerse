@@ -19,9 +19,13 @@ const app = express();
 /* ===============================
    CORS
    =============================== */
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [process.env.FRONTEND_URL]
+  : ["http://localhost:5173", "http://localhost:5174"];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -51,7 +55,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // set true only when HTTPS
+      secure: process.env.NODE_ENV === 'production', // set true only when HTTPS
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })

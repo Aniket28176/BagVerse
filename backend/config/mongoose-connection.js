@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 const config = require("config");
 const dbgr = require("debug")("development:mongoose");
 mongoose
-.connect(`${config.get("MONGODB_URI")}/baggista`)
+.connect(config.get("MONGODB_URI"))
 .then(function(){
     dbgr("connected");
+    console.log("Connected to MongoDB");
 })
 .catch(function(err){
     dbgr(err);

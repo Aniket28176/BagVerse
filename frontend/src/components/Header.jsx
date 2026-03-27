@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 
 const Header = ({ loggedIn = false, isAdmin = false }) => {
   const navigate = useNavigate();
@@ -7,10 +7,10 @@ const Header = ({ loggedIn = false, isAdmin = false }) => {
   const handleLogout = async () => {
     try {
       const logoutUrl = isAdmin
-        ? "http://localhost:5000/api/owners/logout"
-        : "http://localhost:5000/api/users/logout";
+        ? "/api/owners/logout"
+        : "/api/users/logout";
 
-      await axios.post(logoutUrl, {}, { withCredentials: true });
+      await api.post(logoutUrl);
 
       navigate(isAdmin ? "/admin/login" : "/auth");
     } catch (err) {

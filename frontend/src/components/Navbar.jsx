@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Logo from "./Logo";
 import { COLORS, BRAND } from "../constants/branding";
 
@@ -16,9 +16,7 @@ const Navbar = ({ loggedIn = false, isAdmin = false }) => {
     const fetchCartCount = async () => {
       if (!loggedIn) return;
       try {
-        const res = await axios.get("http://localhost:5000/api/cart", {
-          withCredentials: true,
-        });
+        const res = await api.get("/api/cart");
         const count = res.data.items?.length || 0;
         setCartCount(count);
       } catch (err) {
@@ -34,10 +32,10 @@ const Navbar = ({ loggedIn = false, isAdmin = false }) => {
   const handleLogout = async () => {
     try {
       const logoutUrl = isAdmin
-        ? "http://localhost:5000/api/owners/logout"
-        : "http://localhost:5000/api/users/logout";
+        ? "/api/owners/logout"
+        : "/api/users/logout";
 
-      await axios.post(logoutUrl, {}, { withCredentials: true });
+      await api.post(logoutUrl);
       navigate(isAdmin ? "/admin/login" : "/auth");
     } catch (err) {
       console.error("Logout failed:", err);

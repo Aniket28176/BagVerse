@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 
 const CartItem = ({ item, onCartUpdate }) => {
   const [qty, setQty] = useState(1);
@@ -10,10 +10,7 @@ const CartItem = ({ item, onCartUpdate }) => {
   const handleRemove = async () => {
     setIsRemoving(true);
     try {
-      await axios.delete(
-        `http://localhost:5000/api/cart/remove/${item._id}`,
-        { withCredentials: true }
-      );
+      await api.delete(`/api/cart/remove/${item._id}`);
       onCartUpdate();
     } catch (err) {
       console.error("Error removing item:", err);

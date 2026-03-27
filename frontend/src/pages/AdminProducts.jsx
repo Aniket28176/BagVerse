@@ -10,7 +10,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products/admin", {
+      .get("${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/products/admin", {
         withCredentials: true,
       })
       .then((res) => setProducts(res.data.products || []));

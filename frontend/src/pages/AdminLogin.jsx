@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -24,16 +24,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/owners/login",
-        adminData,
-        {
-          withCredentials: true, // 🔥 REQUIRED FOR SESSION
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await api.post("/api/owners/login", adminData);
 
       // ✅ Redirect ONLY after successful login
       navigate("/admin/dashboard", { replace: true });

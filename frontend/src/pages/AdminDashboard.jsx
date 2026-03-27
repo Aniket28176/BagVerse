@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdminProductCard from "../components/AdminProductCard";
@@ -18,10 +18,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/products/admin",
-          { withCredentials: true }
-        );
+        const res = await api.get("/api/products/admin");
 
         // defensive check
         setProducts(Array.isArray(res.data.products) ? res.data.products : []);

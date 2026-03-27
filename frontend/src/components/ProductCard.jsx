@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:5000/api/cart/add`,
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/cart/add`,
         { productId: product._id },
         { withCredentials: true }
       );

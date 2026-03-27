@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -17,17 +17,11 @@ const Account = () => {
 
         /* ---------- TRY ADMIN ---------- */
         try {
-          const adminRes = await axios.get(
-            "http://localhost:5000/api/owners/profile",
-            { withCredentials: true }
-          );
+          const adminRes = await api.get("/api/owners/profile");
           profile = adminRes.data;
         } catch {
           /* ---------- FALLBACK USER ---------- */
-          const userRes = await axios.get(
-            "http://localhost:5000/api/users/profile",
-            { withCredentials: true }
-          );
+          const userRes = await api.get("/api/users/profile");
           profile = userRes.data;
         }
 
@@ -35,18 +29,12 @@ const Account = () => {
 
         /* ---------- ADMIN ---------- */
         if (profile.role === "admin") {
-          const prodRes = await axios.get(
-            "http://localhost:5000/api/products/admin",
-            { withCredentials: true }
-          );
+          const prodRes = await api.get("/api/products/admin");
           setAdminProducts(prodRes.data.products || []);
         }
         /* ---------- USER ---------- */
         else {
-          const orderRes = await axios.get(
-            "http://localhost:5000/api/orders/my",
-            { withCredentials: true }
-          );
+          const orderRes = await api.get("/api/orders/my");
           setOrders(orderRes.data || []);
         }
       } catch (err) {

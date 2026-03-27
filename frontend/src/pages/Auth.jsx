@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { COLORS, BRAND } from "../constants/branding";
@@ -28,11 +28,7 @@ const Auth = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/register",
-        registerData,
-        { withCredentials: true }
-      );
+      const response = await api.post("/api/users/register", registerData);
       setSuccess("Account created successfully! Redirecting...");
       setRegisterData({ fullname: "", email: "", password: "" });
       setTimeout(() => navigate("/shop"), 1500);
@@ -47,11 +43,7 @@ const Auth = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        loginData,
-        { withCredentials: true }
-      );
+      const response = await api.post("/api/users/login", loginData);
       setSuccess("Login successful! Redirecting...");
       setLoginData({ email: "", password: "" });
       setTimeout(() => navigate("/shop"), 1500);
@@ -157,7 +149,7 @@ const Auth = () => {
                         onChange={(e) =>
                           setLoginData({ ...loginData, email: e.target.value })
                         }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 uppercase tracking-wide"
+                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
                         required
                       />
                     </div>
@@ -173,7 +165,7 @@ const Auth = () => {
                         onChange={(e) =>
                           setLoginData({ ...loginData, password: e.target.value })
                         }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 uppercase tracking-wide"
+                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
                         required
                       />
                     </div>
@@ -219,7 +211,7 @@ const Auth = () => {
                             fullname: e.target.value,
                           })
                         }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 uppercase tracking-wide"
+                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
                         required
                       />
                     </div>
@@ -238,7 +230,7 @@ const Auth = () => {
                             email: e.target.value,
                           })
                         }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 uppercase tracking-wide"
+                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
                         required
                       />
                     </div>
@@ -257,7 +249,7 @@ const Auth = () => {
                             password: e.target.value,
                           })
                         }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 uppercase tracking-wide"
+                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
                         required
                       />
                     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -38,9 +38,7 @@ const PlaceOrder = () => {
 
   const fetchCart = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cart", {
-        withCredentials: true,
-      });
+      const res = await api.get("/api/cart");
 
       setCartItems(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -94,23 +92,19 @@ const PlaceOrder = () => {
 
     const totalAmount = calculateTotal();
 
-    await axios.post(
-      "http://localhost:5000/api/orders/create",
-      {
-        products,
-        totalAmount,
-        shippingAddress: {
-          fullname: orderData.fullname,
-          email: orderData.email,
-          phone: orderData.phone,
-          address: orderData.address,
-          city: orderData.city,
-          state: orderData.state,
-          pincode: orderData.pincode,
-        },
+    await api.post("/api/orders/create", {
+      products,
+      totalAmount,
+      shippingAddress: {
+        fullname: orderData.fullname,
+        email: orderData.email,
+        phone: orderData.phone,
+        address: orderData.address,
+        city: orderData.city,
+        state: orderData.state,
+        pincode: orderData.pincode,
       },
-      { withCredentials: true }
-    );
+    });
 
     navigate("/order-success");
   } catch (err) {

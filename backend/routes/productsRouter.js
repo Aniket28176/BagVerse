@@ -49,6 +49,29 @@ router.get("/", async (req, res) => {
 });
 
 /* ======================================================
+   GET SINGLE PRODUCT BY ID
+   GET /api/products/:id
+   ====================================================== */
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await productModel.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const productWithImage = {
+      ...product.toObject(),
+      image: product.image ? product.image.toString("base64") : null,
+    };
+
+    res.json(productWithImage);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching product", error: err.message });
+  }
+});
+
+/* ======================================================
    GET ADMIN PRODUCTS
    GET /api/products/admin
    ====================================================== */
