@@ -37,7 +37,7 @@ app.use(cors({
 }));
 
 // ✅ VERY IMPORTANT (handles preflight requests)
-app.options("*", cors({
+app.options("/*", cors({
   origin: allowedOrigins,
   credentials: true
 }));
