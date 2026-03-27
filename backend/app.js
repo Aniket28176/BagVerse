@@ -27,12 +27,15 @@ app.set("trust proxy", 1);
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://bag-verse-five.vercel.app", // 🔥 PUT YOUR REAL URL
+    "https://bag-verse-five.vercel.app",
   ],
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 🔥 CRITICAL FIX
 
 /* ===============================
    MIDDLEWARE
