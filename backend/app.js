@@ -27,7 +27,7 @@ app.set("trust proxy", 1);
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://bag-verse-brown.vercel.app", // 🔥 PUT YOUR REAL URL
+    "https://bag-verse-five.vercel.app", // 🔥 PUT YOUR REAL URL
   ],
   credentials: true,
 };
