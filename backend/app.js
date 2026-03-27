@@ -20,12 +20,11 @@ const app = express();
    CORS (ALLOW ALL ORIGINS SAFELY)
    =============================== */
 const corsOptions = {
-  origin: true, // 🔥 allow all origins dynamically
+  origin: true, // 🔥 allows all origins dynamically
   credentials: true,
 };
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // 🔥 handle preflight
+app.use(cors(corsOptions)); // ✅ preflight handled automatically
 
 /* ===============================
    MIDDLEWARE
@@ -51,8 +50,8 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      sameSite: "none", // 🔥 required for cross-origin
-      secure: true,     // 🔥 required (HTTPS)
+      sameSite: "none", // 🔥 required for cross-origin cookies
+      secure: true,     // 🔥 required for HTTPS (Render)
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
@@ -80,12 +79,11 @@ app.get("/", (req, res) => {
 });
 
 /* ===============================
-   ERROR HANDLER (FIXED CORS)
+   ERROR HANDLER (CORS SAFE)
    =============================== */
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err);
 
-  // 🔥 ensure CORS headers even on error
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Credentials", "true");
 
