@@ -35,7 +35,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // 🔥 CRITICAL FIX
+app.options("/*", cors(corsOptions)); // 🔥 CRITICAL FIX
 
 /* ===============================
    MIDDLEWARE
