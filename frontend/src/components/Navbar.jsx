@@ -1,4 +1,13 @@
-import { useState, useEffect } from "react";
+api.js->import axios from "axios"; 
+
+const api = axios.create({
+  baseURL: "https://bagverse-ghle.onrender.com",
+  withCredentials: true,   // 🔥 THIS LINE IS MANDATORY
+});
+
+export default api;
+
+Navbar.jsx->import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import Logo from "./Logo";
