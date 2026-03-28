@@ -29,26 +29,37 @@ module.exports.registerUser = async function (req, res) {
       fullname,
     });
 
-    // 🔥 RESET & CREATE SESSION (IMPORTANT)
+    // 🔥 CREATE SESSION SAFELY
     req.session.regenerate((err) => {
       if (err) {
+        console.error("Session regenerate error:", err);
         return res.status(500).json({ message: "Session error" });
       }
 
       req.session.user = {
-        _id: user._id,          // ✅ MUST be _id
+        _id: user._id,
         email: user.email,
-        role: "user",           // ✅ REQUIRED
+        role: "user",
       };
 
-      return res.status(201).json({
-        message: "Account created successfully",
-        user: {
-          _id: user._id,
-          fullname: user.fullname,
-          email: user.email,
-          role: "user",
-        },
+      // 🔥 FORCE SAVE SESSION
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({
+            message: "Session save failed",
+          });
+        }
+
+        return res.status(201).json({
+          message: "Account created successfully",
+          user: {
+            _id: user._id,
+            fullname: user.fullname,
+            email: user.email,
+            role: "user",
+          },
+        });
       });
     });
 
@@ -59,6 +70,7 @@ module.exports.registerUser = async function (req, res) {
     });
   }
 };
+
 
 /* ======================================================
    LOGIN USER (PUBLIC)
@@ -87,26 +99,37 @@ module.exports.loginUser = async function (req, res) {
       });
     }
 
-    // 🔥 RESET & CREATE SESSION (IMPORTANT)
+    // 🔥 CREATE SESSION SAFELY
     req.session.regenerate((err) => {
       if (err) {
+        console.error("Session regenerate error:", err);
         return res.status(500).json({ message: "Session error" });
       }
 
       req.session.user = {
-        _id: user._id,          // ✅ MUST be _id
+        _id: user._id,
         email: user.email,
-        role: "user",           // ✅ REQUIRED
+        role: "user",
       };
 
-      return res.status(200).json({
-        message: "Login successful",
-        user: {
-          _id: user._id,
-          fullname: user.fullname,
-          email: user.email,
-          role: "user",
-        },
+      // 🔥 FORCE SAVE SESSION
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({
+            message: "Session save failed",
+          });
+        }
+
+        return res.status(200).json({
+          message: "Login successful",
+          user: {
+            _id: user._id,
+            fullname: user.fullname,
+            email: user.email,
+            role: "user",
+          },
+        });
       });
     });
 
@@ -118,19 +141,21 @@ module.exports.loginUser = async function (req, res) {
   }
 };
 
+
 /* ======================================================
    LOGOUT USER
    ====================================================== */
 module.exports.logout = function (req, res) {
   req.session.destroy((err) => {
     if (err) {
+      console.error("Logout error:", err);
       return res.status(500).json({
         message: "Logout failed",
       });
     }
 
-    // 🔥 MUST MATCH app.js
-    res.clearCookie("admin.sid");
+    // 🔥 CLEAR CORRECT COOKIE
+    res.clearCookie("baggista.sid");
 
     return res.status(200).json({
       message: "Logged out successfully",

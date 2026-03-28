@@ -24,10 +24,24 @@ app.set("trust proxy", 1);
 /* ===============================
    CORS
    =============================== */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://bag-verse-five.vercel.app"
+];
+
 app.use(
   cors({
-    origin: true,        // 🔥 allows ALL origins dynamically
-    credentials: true,   // 🔥 allows cookies
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // 🔥 DO NOT THROW ERROR
+      return callback(null, false);
+    },
+    credentials: true,
   })
 );
 
@@ -49,16 +63,16 @@ app.use(
     saveUninitialized: false,
 
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
+      mongoUrl: process.env.MONGODB_URL,
       collectionName: "sessions",
     }),
 
     cookie: {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24,
-    },
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
+  maxAge: 1000 * 60 * 60 * 24,
+},
   })
 );
 
