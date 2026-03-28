@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://bagverse-ghle.onrender.com/api", // ✅ ADD /api
+  baseURL: "https://bagverse-ghle.onrender.com", // ✅ ADD /api
   withCredentials: true,
 });
 

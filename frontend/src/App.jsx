@@ -17,6 +17,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
 
+const API = import.meta.env.VITE_API_BASE_URL;
+
 /* ===============================
    USER PROTECTED
    =============================== */
@@ -24,18 +26,35 @@ const UserPrivateRoute = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAuth(data.user?.role === "user");
-      })
-      .catch(() => setAuth(false));
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(`${API}/api/users/check-auth`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // 🔥 Handle non-200 responses
+        if (!res.ok) {
+          setAuth(false);
+          return;
+        }
+
+        const data = await res.json();
+        setAuth(data?.user?.role === "user");
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setAuth(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/auth" />;
+  return auth ? children : <Navigate to="/auth" replace />;
 };
 
 /* ===============================
@@ -45,18 +64,34 @@ const AdminPrivateRoute = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAuth(data.user?.role === "admin");
-      })
-      .catch(() => setAuth(false));
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(`${API}/api/users/check-auth`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          setAuth(false);
+          return;
+        }
+
+        const data = await res.json();
+        setAuth(data?.user?.role === "admin");
+      } catch (error) {
+        console.error("Admin auth failed:", error);
+        setAuth(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/admin/login" />;
+  return auth ? children : <Navigate to="/admin/login" replace />;
 };
 
 /* ===============================
