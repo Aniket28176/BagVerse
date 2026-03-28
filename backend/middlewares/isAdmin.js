@@ -1,12 +1,11 @@
+// middlewares/isAdmin.js ✅
 module.exports = function isAdmin(req, res, next) {
-  if (
-    req.session &&
-    req.session.user &&
-    req.session.user.role === "admin"
-  ) {
-    req.admin = req.session.user;
-    return next();
+  if (!req.session || !req.session.user || req.session.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. Admin only.",
+    });
   }
 
-  return res.status(403).json({ message: "Admin access required" });
+  next();
 };

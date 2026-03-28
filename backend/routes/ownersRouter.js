@@ -98,7 +98,7 @@ router.get("/profile", async (req, res) => {
    ====================================================== */
 router.post("/logout", (req, res) => {
   req.session.destroy(() => {
-    res.clearCookie("admin.sid");
+    res.clearCookie("baggista.sid");
     res.json({ message: "Logged out" });
   });
 });
