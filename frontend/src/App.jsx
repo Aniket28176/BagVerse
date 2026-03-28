@@ -18,24 +18,38 @@ import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
 
 /* ===============================
+   🔥 COMMON AUTH CHECK FUNCTION
+   =============================== */
+const checkAuth = async () => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Unauthorized");
+
+    const data = await res.json();
+    return data.user;
+  } catch {
+    return null;
+  }
+};
+
+/* ===============================
    USER PROTECTED
    =============================== */
 const UserPrivateRoute = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAuth(data.user?.role === "user");
-      })
-      .catch(() => setAuth(false));
+    checkAuth().then((user) => {
+      setAuth(user?.role === "user");
+    });
   }, []);
 
   if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/auth" />;
+
+  return auth ? children : <Navigate to="/auth" replace />;
 };
 
 /* ===============================
@@ -45,18 +59,14 @@ const AdminPrivateRoute = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/check-auth`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAuth(data.user?.role === "admin");
-      })
-      .catch(() => setAuth(false));
+    checkAuth().then((user) => {
+      setAuth(user?.role === "admin");
+    });
   }, []);
 
   if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/admin/login" />;
+
+  return auth ? children : <Navigate to="/admin/login" replace />;
 };
 
 /* ===============================
@@ -67,7 +77,7 @@ const App = () => {
     <Router>
       <Routes>
 
-        {/* USER */}
+        {/* USER ROUTES */}
         <Route path="/" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
         <Route path="/shop" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
         <Route path="/cart" element={<UserPrivateRoute><Cart /></UserPrivateRoute>} />
@@ -76,9 +86,10 @@ const App = () => {
         <Route path="/place-order" element={<UserPrivateRoute><PlaceOrder /></UserPrivateRoute>} />
         <Route path="/order-success" element={<UserPrivateRoute><OrderSuccess /></UserPrivateRoute>} />
 
+        {/* AUTH */}
         <Route path="/auth" element={<Auth />} />
 
-        {/* ADMIN */}
+        {/* ADMIN ROUTES */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/dashboard" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
