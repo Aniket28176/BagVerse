@@ -44,7 +44,6 @@ app.use(
     credentials: true,
   })
 );
-
 /* ===============================
    MIDDLEWARE
    =============================== */
@@ -63,7 +62,7 @@ app.use(
     saveUninitialized: false,
 
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
+      mongoUrl: process.env.MONGODB_URI,
       collectionName: "sessions",
     }),
 
