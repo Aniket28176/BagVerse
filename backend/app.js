@@ -26,7 +26,7 @@ app.set("trust proxy", 1);
    =============================== */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://bag-verse-five.vercel.app"
+  "https://bag-verse-sable.vercel.app",
 ];
 
 app.use(
