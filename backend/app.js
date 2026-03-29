@@ -15,53 +15,97 @@ const ordersRouter = require("./routes/ordersRouter");
 
 const app = express();
 
+/* ===============================
+TRUST PROXY (IMPORTANT FOR RENDER)
+=============================== */
 app.set("trust proxy", 1);
 
-/* CORS */
+/* ===============================
+CORS (FIXED)
+=============================== */
+const allowedOrigins = [
+"http://localhost:5173",
+"https://bag-verse-ivory.vercel.app", // ✅ no trailing slash
+];
+
 app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://bag-verse-ivory.vercel.app/"],
-    credentials: true,
-  })
+cors({
+origin: function (origin, callback) {
+if (!origin) return callback(null, true); // allow Postman / mobile
+
+```
+  if (allowedOrigins.includes(origin)) {
+    return callback(null, true);
+  }
+
+  return callback(null, false);
+},
+credentials: true,
+```
+
+})
 );
 
-/* MIDDLEWARE */
-app.use(express.json());
+/* ===============================
+MIDDLEWARE
+=============================== */
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
-/* SESSION */
+/* ===============================
+SESSION (PRODUCTION READY)
+=============================== */
+const isProd = process.env.NODE_ENV === "production";
+
 app.use(
-  session({
-    name: "baggista.sid",
-    secret: process.env.EXPRESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
-    }),
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-    },
-  })
+session({
+name: "baggista.sid",
+secret: process.env.EXPRESS_SESSION_SECRET || "baggista_secret",
+resave: false,
+saveUninitialized: false,
+
+```
+store: MongoStore.create({
+  mongoUrl: process.env.MONGODB_URL,
+  collectionName: "sessions",
+}),
+
+cookie: {
+  httpOnly: true,
+  secure: isProd,               // 🔥 true in production
+  sameSite: isProd ? "none" : "lax", // 🔥 required for cross-origin
+  maxAge: 1000 * 60 * 60 * 24, // 1 day
+},
+```
+
+})
 );
 
-/* ROUTES */
+/* ===============================
+ROUTES
+=============================== */
 app.use("/api/users", usersRouter);
-app.use("/api/products", productsRouter); // ✅ FIX
-app.use("/api/cart", cartRouter);         // ✅ FIX
-app.use("/api/orders", ordersRouter);     // ✅ FIX
+app.use("/api/products", productsRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/orders", ordersRouter);
 
-/* TEST ROUTE */
+/* ===============================
+HEALTH CHECK
+=============================== */
 app.get("/", (req, res) => {
-  res.json({
-    status: "Backend running 🚀",
-    loggedIn: !!req.session.user,
-  });
+res.json({
+status: "Backend running 🚀",
+loggedIn: !!req.session.user,
+env: process.env.NODE_ENV,
+});
 });
 
-/* SERVER */
-app.listen(5000, () => {
-  console.log("Server running on 5000 🚀");
+/* ===============================
+SERVER
+=============================== */
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+console.log(`✅ Server running on ${PORT}`);
 });
