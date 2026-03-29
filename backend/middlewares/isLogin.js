@@ -6,7 +6,7 @@ module.exports = function isLogin(req, res, next) {
     });
   }
 
-  req.user = req.session.user; // safe now
+  req.user = req.session.user;
   next();
 };
 

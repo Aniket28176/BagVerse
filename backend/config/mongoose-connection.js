@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 const config = require("config");
 const dbgr = require("debug")("development:mongoose");
 
-const dbURI = process.env.MONGODB_URI || (config.has("MONGODB_URI") ? config.get("MONGODB_URI") : null);
+const dbURL = process.env.MONGODB_URL || (config.has("MONGODB_URL") ? config.get("MONGODB_URL") : null);
 
-if (!dbURI) {
-  console.error("❌ MONGODB_URI is not set. Set process.env.MONGODB_URI or config/MONGODB_URI.");
-  throw new Error("MONGODB_URI is not configured");
+if (!dbURL) {
+  console.error("❌ MONGODB_URL is not set. Set process.env.MONGODB_URL or config/MONGODB_URL.");
+  throw new Error("MONGODB_URL is not configured");
 }
 
 mongoose
-  .connect(dbURI)
+  .connect(dbURL)
   .then(function () {
     dbgr("connected");
     console.log("Connected to MongoDB");

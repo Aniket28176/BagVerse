@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://bagverse-ghle.onrender.com", // ✅ ADD /api
+  baseURL: "http://localhost:5000",
   withCredentials: true,
 });
 

@@ -24,7 +24,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      await api.post("/api/owners/login", adminData);
+      await api.post("/api/users/login", data);
 
       // ✅ Redirect ONLY after successful login
       navigate("/admin/dashboard", { replace: true });

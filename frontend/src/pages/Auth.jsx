@@ -6,285 +6,277 @@ import Footer from "../components/Footer";
 import { COLORS, BRAND } from "../constants/branding";
 
 const Auth = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("login");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+const navigate = useNavigate();
 
-  const [registerData, setRegisterData] = useState({
-    fullname: "",
-    email: "",
-    password: "",
-  });
+const [activeTab, setActiveTab] = useState("login");
+const [role, setRole] = useState("user");
+const [adminSecret, setAdminSecret] = useState("");
 
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: "",
-  });
+const [error, setError] = useState("");
+const [success, setSuccess] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+const [registerData, setRegisterData] = useState({
+fullname: "",
+email: "",
+password: "",
+});
 
-    try {
-      const response = await api.post("/api/users/register", registerData);
-      setSuccess("Account created successfully! Redirecting...");
-      setRegisterData({ fullname: "", email: "", password: "" });
-      setTimeout(() => navigate("/shop"), 1500);
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    }
+const [loginData, setLoginData] = useState({
+email: "",
+password: "",
+});
+
+/* ================= REGISTER ================= */
+const handleRegister = async (e) => {
+e.preventDefault();
+setError("");
+setSuccess("");
+
+try {
+  const payload = {
+    ...registerData,
+    role,
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+  // 🔐 Admin requires secret
+  if (role === "admin") {
+    payload.secret = adminSecret;
+  }
 
-    try {
-      const response = await api.post("/api/users/login", loginData);
-      setSuccess("Login successful! Redirecting...");
-      setLoginData({ email: "", password: "" });
-      setTimeout(() => navigate("/shop"), 1500);
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
-  };
+  await api.post("/api/users/register", payload);
 
-  return (
-    <>
-      <Navbar loggedIn={false} />
+  setSuccess("Account created! Redirecting...");
+  setRegisterData({ fullname: "", email: "", password: "" });
+  setAdminSecret("");
 
-      {/* Toast Notifications */}
-      {error && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 z-50 font-bold text-xs uppercase tracking-widest shadow-lg animate-slideInFromTop">
-          ⚠️ {error}
-        </div>
-      )}
-      {success && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 z-50 font-bold text-xs uppercase tracking-widest shadow-lg animate-slideInFromTop">
-          ✓ {success}
-        </div>
-      )}
+  setTimeout(() => {
+    navigate(role === "admin" ? "/admin" : "/shop");
+  }, 1500);
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-4xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Branding */}
-            <div className="hidden md:flex flex-col justify-center items-start text-white">
-              <div className="mb-10 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
-                <h1 className="text-6xl font-bold mb-2 uppercase tracking-tight" style={{ color: COLORS.accent }}>
-                  Welcome
-                </h1>
-                <p className="text-sm text-gray-400 uppercase tracking-wider">{BRAND.tagline}</p>
-              </div>
+} catch (err) {
+  setError(err.response?.data?.message || "Registration failed");
+}
 
-              <div className="space-y-6 text-gray-300">
-                <div className="flex items-start gap-4 animate-fadeInUp" style={{ animationDelay: '200ms' }}>
-                  <span className="text-3xl mt-1">💼</span>
-                  <div>
-                    <p className="font-bold text-white uppercase tracking-wide text-sm">Premium Bags</p>
-                    <p className="text-xs font-light text-gray-400 uppercase tracking-wide mt-1">Exclusive collection</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4 animate-fadeInUp" style={{ animationDelay: '300ms' }}>
-                  <span className="text-3xl mt-1">🚀</span>
-                  <div>
-                    <p className="font-bold text-white uppercase tracking-wide text-sm">Quick Shipping</p>
-                    <p className="text-xs font-light text-gray-400 uppercase tracking-wide mt-1">Fast delivery</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4 animate-fadeInUp" style={{ animationDelay: '400ms' }}>
-                  <span className="text-3xl mt-1">🔐</span>
-                  <div>
-                    <p className="font-bold text-white uppercase tracking-wide text-sm">Secure Checkout</p>
-                    <p className="text-xs font-light text-gray-400 uppercase tracking-wide mt-1">Protected payment</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Right Side - Auth Forms */}
-            <div className="bg-white shadow-2xl p-10 border border-gray-200 animate-fadeInDown" style={{ animationDelay: '200ms' }}>
-              {/* Tabs */}
-              <div className="flex gap-4 mb-10 border-b border-gray-200 pb-4">
-                <button
-                  onClick={() => setActiveTab("login")}
-                  className={`py-2 px-0 font-bold uppercase tracking-widest text-xs transition-all duration-300 border-b-2 ${
-                    activeTab === "login"
-                      ? "text-black border-yellow-600"
-                      : "text-gray-400 border-transparent hover:text-gray-600"
-                  }`}
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => setActiveTab("register")}
-                  className={`py-2 px-0 font-bold uppercase tracking-widest text-xs transition-all duration-300 border-b-2 ${
-                    activeTab === "register"
-                      ? "text-black border-yellow-600"
-                      : "text-gray-400 border-transparent hover:text-gray-600"
-                  }`}
-                >
-                  Sign Up
-                </button>
-              </div>
+};
 
-              {/* Login Form */}
-              {activeTab === "login" && (
-                <div className="animate-fadeIn">
-                  <h2 className="text-2xl font-bold text-black mb-1 uppercase tracking-tight">Welcome Back</h2>
-                  <p className="text-xs text-gray-500 mb-8 uppercase tracking-wide font-light">Login to your account</p>
+/* ================= LOGIN ================= */
+const handleLogin = async (e) => {
+e.preventDefault();
+setError("");
+setSuccess("");
 
-                  <form onSubmit={handleLogin} autoComplete="off" className="space-y-6">
-                    <div>
-                      <label className="block text-xs font-bold text-black mb-3 uppercase tracking-widest">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="you@example.com"
-                        value={loginData.email}
-                        onChange={(e) =>
-                          setLoginData({ ...loginData, email: e.target.value })
-                        }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
-                        required
-                      />
-                    </div>
+try {
+  const res = await api.post("/api/users/login", loginData);
 
-                    <div>
-                      <label className="block text-xs font-bold text-black mb-3 uppercase tracking-widest">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={loginData.password}
-                        onChange={(e) =>
-                          setLoginData({ ...loginData, password: e.target.value })
-                        }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
-                        required
-                      />
-                    </div>
+  setSuccess("Login successful!");
+  setLoginData({ email: "", password: "" });
 
-                    <button
-                      type="submit"
-                      className="w-full py-4 px-4 bg-yellow-600 text-black font-bold uppercase tracking-widest text-xs hover:bg-yellow-500 active:scale-95 transition-all duration-300 mt-8"
-                    >
-                      Login
-                    </button>
-                  </form>
+  const userRole = res.data.user.role;
 
-                  <p className="text-center text-xs text-gray-500 mt-6 uppercase tracking-wide">
-                    Don't have an account?{" "}
-                    <button
-                      onClick={() => setActiveTab("register")}
-                      className="text-yellow-600 font-bold hover:text-yellow-500 transition-colors duration-300"
-                    >
-                      Sign Up
-                    </button>
-                  </p>
-                </div>
-              )}
+  setTimeout(() => {
+    navigate(userRole === "admin" ? "/admin" : "/shop");
+  }, 1500);
 
-              {/* Register Form */}
-              {activeTab === "register" && (
-                <div className="animate-fadeIn">
-                  <h2 className="text-2xl font-bold text-black mb-1 uppercase tracking-tight">Create Account</h2>
-                  <p className="text-xs text-gray-500 mb-8 uppercase tracking-wide font-light">Join {BRAND.name} today</p>
+} catch (err) {
+  setError(err.response?.data?.message || "Login failed");
+}
 
-                  <form onSubmit={handleRegister} autoComplete="off" className="space-y-6">
-                    <div>
-                      <label className="block text-xs font-bold text-black mb-3 uppercase tracking-widest">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="John Doe"
-                        value={registerData.fullname}
-                        onChange={(e) =>
-                          setRegisterData({
-                            ...registerData,
-                            fullname: e.target.value,
-                          })
-                        }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
-                        required
-                      />
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-black mb-3 uppercase tracking-widest">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="you@example.com"
-                        value={registerData.email}
-                        onChange={(e) =>
-                          setRegisterData({
-                            ...registerData,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
-                        required
-                      />
-                    </div>
+};
 
-                    <div>
-                      <label className="block text-xs font-bold text-black mb-3 uppercase tracking-widest">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={registerData.password}
-                        onChange={(e) =>
-                          setRegisterData({
-                            ...registerData,
-                            password: e.target.value,
-                          })
-                        }
-                        className="w-full px-0 py-3 border-b border-gray-300 focus:outline-none focus:border-yellow-600 bg-transparent text-black placeholder-gray-400 text-sm transition-colors duration-300 tracking-wide"
-                        required
-                      />
-                    </div>
+return (
+<> <Navbar loggedIn={false} />
 
-                    <p className="text-xs text-gray-500 font-light uppercase tracking-wide">
-                      By creating an account, you agree to our Terms & Privacy Policy
-                    </p>
+  {/* TOASTS */}
+  {error && (
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-sm font-semibold">
+      ⚠️ {error}
+    </div>
+  )}
+  {success && (
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-sm font-semibold">
+      ✓ {success}
+    </div>
+  )}
 
-                    <button
-                      type="submit"
-                      className="w-full py-4 px-4 bg-yellow-600 text-black font-bold uppercase tracking-widest text-xs hover:bg-yellow-500 active:scale-95 transition-all duration-300 mt-8"
-                    >
-                      Create Account
-                    </button>
-                  </form>
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 px-4 py-12">
 
-                  <p className="text-center text-xs text-gray-500 mt-6 uppercase tracking-wide">
-                    Already have an account?{" "}
-                    <button
-                      onClick={() => setActiveTab("login")}
-                      className="text-yellow-600 font-bold hover:text-yellow-500 transition-colors duration-300"
-                    >
-                      Login
-                    </button>
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+
+      {/* LEFT */}
+      <div className="hidden md:flex flex-col justify-center p-10 text-white">
+        <h1 className="text-5xl font-bold mb-4" style={{ color: COLORS.accent }}>
+          {BRAND.name}
+        </h1>
+        <p className="text-gray-400 mb-8">{BRAND.tagline}</p>
+
+        <ul className="space-y-4 text-sm">
+          <li>✨ Premium Quality Products</li>
+          <li>🚀 Fast Delivery</li>
+          <li>🔐 Secure Checkout</li>
+        </ul>
       </div>
 
-      <Footer />
-    </>
-  );
+      {/* RIGHT */}
+      <div className="p-8 md:p-12 bg-white rounded-l-3xl">
+
+        {/* TABS */}
+        <div className="flex mb-8 border-b">
+          {["login", "register"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 pb-3 text-sm font-bold uppercase tracking-widest transition ${
+                activeTab === tab
+                  ? "border-b-2 border-yellow-600 text-black"
+                  : "text-gray-400"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* LOGIN */}
+        {activeTab === "login" && (
+          <form onSubmit={handleLogin} className="space-y-6">
+
+            {/* ROLE SWITCH */}
+            <div className="flex gap-2">
+              {["user", "admin"].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase ${
+                    role === r
+                      ? "bg-yellow-600 text-black"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            <input
+              type="email"
+              placeholder="Email"
+              value={loginData.email}
+              onChange={(e) =>
+                setLoginData({ ...loginData, email: e.target.value })
+              }
+              className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={loginData.password}
+              onChange={(e) =>
+                setLoginData({ ...loginData, password: e.target.value })
+              }
+              className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+              required
+            />
+
+            <button className="w-full bg-yellow-600 text-black py-3 font-bold uppercase hover:bg-yellow-500 transition">
+              Login
+            </button>
+          </form>
+        )}
+
+        {/* REGISTER */}
+        {activeTab === "register" && (
+          <form onSubmit={handleRegister} className="space-y-5">
+
+            {/* ROLE SWITCH */}
+            <div className="flex gap-2">
+              {["user", "admin"].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase ${
+                    role === r
+                      ? "bg-yellow-600 text-black"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            {/* ADMIN SECRET */}
+            {role === "admin" && (
+              <input
+                type="password"
+                placeholder="Admin Secret Key"
+                value={adminSecret}
+                onChange={(e) => setAdminSecret(e.target.value)}
+                className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+                required
+              />
+            )}
+
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={registerData.fullname}
+              onChange={(e) =>
+                setRegisterData({
+                  ...registerData,
+                  fullname: e.target.value,
+                })
+              }
+              className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+              required
+            />
+
+            <input
+              type="email"
+              placeholder="Email"
+              value={registerData.email}
+              onChange={(e) =>
+                setRegisterData({
+                  ...registerData,
+                  email: e.target.value,
+                })
+              }
+              className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={registerData.password}
+              onChange={(e) =>
+                setRegisterData({
+                  ...registerData,
+                  password: e.target.value,
+                })
+              }
+              className="w-full border-b py-3 focus:outline-none focus:border-yellow-600"
+              required
+            />
+
+            <button className="w-full bg-yellow-600 text-black py-3 font-bold uppercase hover:bg-yellow-500 transition">
+              Create Account
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+</>
+
+);
 };
 
 export default Auth;

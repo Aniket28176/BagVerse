@@ -33,13 +33,11 @@ const Navbar = ({ loggedIn = false, isAdmin = false }) => {
      =============================== */
   const handleLogout = async () => {
   try {
-    await api.post(
-      isAdmin ? "/api/owners/logout" : "/api/users/logout"
-    ); // ✅ FIXED
+    await api.post("/api/users/logout");
 
-    navigate(isAdmin ? "/admin/login" : "/auth");
+    navigate("/auth"); // ✅ ALWAYS go to common auth page
   } catch (err) {
-    console.error(err);
+    console.error("Logout error:", err);
   }
 };
 

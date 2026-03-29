@@ -20,27 +20,19 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    /* ===============================
-       CART (FIXED)
-       =============================== */
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
     cart: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product", // ✅ MUST MATCH product model name
+        ref: "Product",
       },
     ],
 
-    /* ===============================
-       ROLE
-       =============================== */
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-
-    /* ===============================
-       ORDERS (STRUCTURED)
-       =============================== */
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -49,7 +41,7 @@ const userSchema = new mongoose.Schema(
     ],
 
     contact: {
-      type: String, // ✅ phone numbers are strings
+      type: String,
       default: "",
     },
 

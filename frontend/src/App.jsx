@@ -20,109 +20,97 @@ import CreateProduct from "./pages/CreateProduct";
 const API = import.meta.env.VITE_API_BASE_URL;
 
 /* ===============================
-   USER PROTECTED
-   =============================== */
+USER PROTECTED
+=============================== */
 const UserPrivateRoute = ({ children }) => {
-  const [auth, setAuth] = useState(null);
+const [auth, setAuth] = useState(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch(`${API}/api/users/check-auth`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+useEffect(() => {
+const checkAuth = async () => {
+try {
+const res = await fetch(`${API}/api/users/check-auth`, {
+credentials: "include",
+});
 
-        // 🔥 Handle non-200 responses
-        if (!res.ok) {
-          setAuth(false);
-          return;
-        }
+    if (!res.ok) return setAuth(false);
 
-        const data = await res.json();
-        setAuth(data?.user?.role === "user");
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        setAuth(false);
-      }
-    };
+    const data = await res.json();
+    setAuth(data?.user?.role === "user");
+  } catch {
+    setAuth(false);
+  }
+};
 
-    checkAuth();
-  }, []);
+checkAuth();
 
-  if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/auth" replace />;
+}, []);
+
+if (auth === null) return <div>Loading...</div>;
+return auth ? children : <Navigate to="/auth" replace />;
 };
 
 /* ===============================
-   ADMIN PROTECTED
-   =============================== */
+ADMIN PROTECTED
+=============================== */
 const AdminPrivateRoute = ({ children }) => {
-  const [auth, setAuth] = useState(null);
+const [auth, setAuth] = useState(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch(`${API}/api/users/check-auth`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+useEffect(() => {
+const checkAuth = async () => {
+try {
+const res = await fetch(`${API}/api/users/check-auth`, {
+credentials: "include",
+});
 
-        if (!res.ok) {
-          setAuth(false);
-          return;
-        }
+    if (!res.ok) return setAuth(false);
 
-        const data = await res.json();
-        setAuth(data?.user?.role === "admin");
-      } catch (error) {
-        console.error("Admin auth failed:", error);
-        setAuth(false);
-      }
-    };
+    const data = await res.json();
+    setAuth(data?.user?.role === "admin");
+  } catch {
+    setAuth(false);
+  }
+};
 
-    checkAuth();
-  }, []);
+checkAuth();
 
-  if (auth === null) return <div>Loading...</div>;
-  return auth ? children : <Navigate to="/admin/login" replace />;
+}, []);
+
+if (auth === null) return <div>Loading...</div>;
+return auth ? children : <Navigate to="/admin/login" replace />;
 };
 
 /* ===============================
-   ROUTES
-   =============================== */
+ROUTES
+=============================== */
 const App = () => {
-  return (
-    <Router>
-      <Routes>
+return ( <Router> <Routes>
 
-        {/* USER */}
-        <Route path="/" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
-        <Route path="/shop" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
-        <Route path="/cart" element={<UserPrivateRoute><Cart /></UserPrivateRoute>} />
-        <Route path="/account" element={<UserPrivateRoute><Account /></UserPrivateRoute>} />
-        <Route path="/buynow/:id" element={<UserPrivateRoute><BuyNow /></UserPrivateRoute>} />
-        <Route path="/place-order" element={<UserPrivateRoute><PlaceOrder /></UserPrivateRoute>} />
-        <Route path="/order-success" element={<UserPrivateRoute><OrderSuccess /></UserPrivateRoute>} />
+    {/* USER */}
+    <Route path="/" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
+    <Route path="/shop" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
+    <Route path="/cart" element={<UserPrivateRoute><Cart /></UserPrivateRoute>} />
+    <Route path="/account" element={<UserPrivateRoute><Account /></UserPrivateRoute>} />
+    <Route path="/buynow/:id" element={<UserPrivateRoute><BuyNow /></UserPrivateRoute>} />
+    <Route path="/place-order" element={<UserPrivateRoute><PlaceOrder /></UserPrivateRoute>} />
+    <Route path="/order-success" element={<UserPrivateRoute><OrderSuccess /></UserPrivateRoute>} />
 
-        <Route path="/auth" element={<Auth />} />
+    <Route path="/auth" element={<Auth />} />
 
-        {/* ADMIN */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/signup" element={<AdminSignup />} />
-        <Route path="/admin/dashboard" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
-        <Route path="/admin/products" element={<AdminPrivateRoute><AdminProducts /></AdminPrivateRoute>} />
-        <Route path="/admin/products/create" element={<AdminPrivateRoute><CreateProduct /></AdminPrivateRoute>} />
+    {/* ADMIN */}
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/admin/signup" element={<AdminSignup />} />
 
-      </Routes>
-    </Router>
-  );
+    {/* 🔥 FIXED ADMIN ROOT */}
+    <Route path="/admin" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
+
+    <Route path="/admin/dashboard" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
+    <Route path="/admin/products" element={<AdminPrivateRoute><AdminProducts /></AdminPrivateRoute>} />
+    <Route path="/admin/products/create" element={<AdminPrivateRoute><CreateProduct /></AdminPrivateRoute>} />
+
+  </Routes>
+</Router>
+
+);
 };
 
 export default App;

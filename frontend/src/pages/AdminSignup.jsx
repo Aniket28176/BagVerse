@@ -21,7 +21,11 @@ const AdminSignup = () => {
     setSuccess("");
 
     try {
-      await api.post("/api/owners/create", formData);
+      await api.post("/api/users/register", {
+  ...formData,
+  role: "admin",
+  secret: adminSecret, // required
+});
 
       setSuccess("Admin account created. You can now log in.");
 
