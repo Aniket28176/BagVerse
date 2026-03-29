@@ -33,7 +33,6 @@ cors({
 origin: function (origin, callback) {
 if (!origin) return callback(null, true); // allow Postman / mobile
 
-```
   if (allowedOrigins.includes(origin)) {
     return callback(null, true);
   }
@@ -41,7 +40,6 @@ if (!origin) return callback(null, true); // allow Postman / mobile
   return callback(null, false);
 },
 credentials: true,
-```
 
 })
 );
@@ -64,8 +62,6 @@ name: "baggista.sid",
 secret: process.env.EXPRESS_SESSION_SECRET || "baggista_secret",
 resave: false,
 saveUninitialized: false,
-
-```
 store: MongoStore.create({
   mongoUrl: process.env.MONGODB_URL,
   collectionName: "sessions",
@@ -77,7 +73,6 @@ cookie: {
   sameSite: isProd ? "none" : "lax", // 🔥 required for cross-origin
   maxAge: 1000 * 60 * 60 * 24, // 1 day
 },
-```
 
 })
 );
