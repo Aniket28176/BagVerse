@@ -11,11 +11,10 @@ import PlaceOrder from "./pages/PlaceOrder";
 import OrderSuccess from "./pages/OrderSuccess";
 
 /* ADMIN */
-import AdminLogin from "./pages/AdminLogin";
-import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
+import EditProduct from "./pages/EditProduct";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -76,7 +75,7 @@ checkAuth();
 }, []);
 
 if (auth === null) return <div>Loading...</div>;
-return auth ? children : <Navigate to="/admin/login" replace />;
+return auth ? children : <Navigate to="/auth" replace />;
 };
 
 /* ===============================
@@ -97,8 +96,8 @@ return ( <Router> <Routes>
     <Route path="/auth" element={<Auth />} />
 
     {/* ADMIN */}
-    <Route path="/admin/login" element={<AdminLogin />} />
-    <Route path="/admin/signup" element={<AdminSignup />} />
+    <Route path="/admin/login" element={<Navigate to="/auth" replace />} />
+    <Route path="/admin/signup" element={<Navigate to="/auth" replace />} />
 
     {/* 🔥 FIXED ADMIN ROOT */}
     <Route path="/admin" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
@@ -106,6 +105,7 @@ return ( <Router> <Routes>
     <Route path="/admin/dashboard" element={<AdminPrivateRoute><AdminDashboard /></AdminPrivateRoute>} />
     <Route path="/admin/products" element={<AdminPrivateRoute><AdminProducts /></AdminPrivateRoute>} />
     <Route path="/admin/products/create" element={<AdminPrivateRoute><CreateProduct /></AdminPrivateRoute>} />
+    <Route path="/admin/products/:id" element={<AdminPrivateRoute><EditProduct /></AdminPrivateRoute>} />
 
   </Routes>
 </Router>

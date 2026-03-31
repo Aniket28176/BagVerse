@@ -17,10 +17,17 @@ router.post("/login", loginUser);
 router.post("/logout", logout);
 
 /* CHECK AUTH */
-router.get("/check-auth", isLogin, (req, res) => {
+router.get("/check-auth", (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.json({
+      authenticated: false,
+      user: null,
+    });
+  }
+
   res.json({
     authenticated: true,
-    user: req.user,
+    user: req.session.user,
   });
 });
 

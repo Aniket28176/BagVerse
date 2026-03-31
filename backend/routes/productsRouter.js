@@ -36,11 +36,7 @@ router.get("/", async (req, res) => {
    =============================== */
 router.get("/admin", isLogin, isAdmin, async (req, res) => {
   try {
-    console.log("USER:", req.user); // debug
-
-    const products = await productModel.find({
-      createdBy: req.user._id, // ✅ FIXED
-    });
+    const products = await productModel.find().sort({ createdAt: -1 });
 
     const formatted = products.map((p) => ({
       ...p.toObject(),
@@ -48,7 +44,6 @@ router.get("/admin", isLogin, isAdmin, async (req, res) => {
     }));
 
     res.json({ products: formatted });
-
   } catch (err) {
     console.error("ADMIN PRODUCTS ERROR:", err);
     res.status(500).json({ message: err.message });
@@ -69,6 +64,61 @@ router.get("/:id", async (req, res) => {
     ...product.toObject(),
     image: product.image?.toString("base64"),
   });
+});
+
+/* ===============================
+   UPDATE PRODUCT
+   =============================== */
+router.put("/:id", isLogin, isAdmin, upload.single("image"), async (req, res) => {
+  try {
+    const product = await productModel.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.name = req.body.name ?? product.name;
+    product.price = req.body.price !== undefined ? Number(req.body.price) : product.price;
+    product.discount = req.body.discount !== undefined ? Number(req.body.discount || 0) : product.discount;
+    product.bgcolor = req.body.bgcolor ?? product.bgcolor;
+    product.panelcolor = req.body.panelcolor ?? product.panelcolor;
+    product.textcolor = req.body.textcolor ?? product.textcolor;
+
+    if (req.file?.buffer) {
+      product.image = req.file.buffer;
+    }
+
+    await product.save();
+
+    res.json({
+      message: "Product updated successfully",
+      product: {
+        ...product.toObject(),
+        image: product.image ? product.image.toString("base64") : null,
+      },
+    });
+  } catch (err) {
+    console.error("UPDATE ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ===============================
+   DELETE PRODUCT
+   =============================== */
+router.delete("/:id", isLogin, isAdmin, async (req, res) => {
+  try {
+    const deletedProduct = await productModel.findByIdAndDelete(req.params.id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (err) {
+    console.error("DELETE ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
 });
 
 /* ===============================

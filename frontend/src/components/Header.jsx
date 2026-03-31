@@ -12,7 +12,7 @@ const Header = ({ loggedIn = false, isAdmin = false }) => {
 
       await api.post(logoutUrl);
 
-      navigate(isAdmin ? "/admin/login" : "/auth");
+      navigate("/auth");
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -25,9 +25,8 @@ const Header = ({ loggedIn = false, isAdmin = false }) => {
       {/* ================= LOGGED OUT ================= */}
       {!loggedIn && (
         <div className="flex gap-5">
-          <Link to="/auth">User Login</Link>
-          <Link to="/admin/login" className="text-blue-600 font-semibold">
-            Admin Login
+          <Link to="/auth" className="text-blue-600 font-semibold">
+            Login / Register
           </Link>
         </div>
       )}
