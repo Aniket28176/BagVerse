@@ -9,6 +9,7 @@ require("./config/mongoose-connection");
 
 /* ROUTES IMPORT */
 const usersRouter = require("./routes/usersRouter");
+const ownersRouter = require("./routes/ownersRouter");
 const productsRouter = require("./routes/productsRouter");
 const cartRouter = require("./routes/cartRouter");
 const ordersRouter = require("./routes/ordersRouter");
@@ -16,16 +17,10 @@ const ordersRouter = require("./routes/ordersRouter");
 const app = express();
 
 /* ===============================
-TRUST PROXY (IMPORTANT FOR RENDER)
-=============================== */
-app.set("trust proxy", 1);
-
-/* ===============================
-CORS (FIXED)
+CORS (DEVELOPMENT ONLY)
 =============================== */
 const allowedOrigins = [
-"http://localhost:5173",
-"https://bag-verse-ivory.vercel.app", // ✅ no trailing slash
+  "http://localhost:5173",
 ];
 
 app.use(
@@ -52,35 +47,32 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 /* ===============================
-SESSION (PRODUCTION READY)
+SESSION (DEVELOPMENT ONLY)
 =============================== */
-const isProd = process.env.NODE_ENV === "production";
-
 app.use(
-session({
-name: "baggista.sid",
-secret: process.env.EXPRESS_SESSION_SECRET || "baggista_secret",
-resave: false,
-saveUninitialized: false,
-store: MongoStore.create({
-  mongoUrl: process.env.MONGODB_URL,
-  collectionName: "sessions",
-}),
+  session({
+    name: "baggista.sid",
+    secret: process.env.EXPRESS_SESSION_SECRET || "baggista_secret",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URL,
+      collectionName: "sessions",
+    }),
 
-cookie: {
-  httpOnly: true,
-  secure: isProd,               // 🔥 true in production
-  sameSite: isProd ? "none" : "lax", // 🔥 required for cross-origin
-  maxAge: 1000 * 60 * 60 * 24, // 1 day
-},
-
-})
-);
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  }));
 
 /* ===============================
 ROUTES
 =============================== */
 app.use("/api/users", usersRouter);
+app.use("/api/owners", ownersRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/orders", ordersRouter);
@@ -89,11 +81,10 @@ app.use("/api/orders", ordersRouter);
 HEALTH CHECK
 =============================== */
 app.get("/", (req, res) => {
-res.json({
-status: "Backend running 🚀",
-loggedIn: !!req.session.user,
-env: process.env.NODE_ENV,
-});
+  res.json({
+    status: "Backend running 🚀",
+    loggedIn: !!req.session.user,
+  });
 });
 
 /* ===============================

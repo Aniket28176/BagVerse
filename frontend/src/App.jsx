@@ -15,8 +15,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
 import EditProduct from "./pages/EditProduct";
+import Stairs from "./components/Stairs";
 
-const API = import.meta.env.VITE_API_BASE_URL;
+const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 /* ===============================
 USER PROTECTED
@@ -82,7 +83,10 @@ return auth ? children : <Navigate to="/auth" replace />;
 ROUTES
 =============================== */
 const App = () => {
-return ( <Router> <Routes>
+return ( 
+<Router>
+  <Stairs>
+   <Routes>
 
     {/* USER */}
     <Route path="/" element={<UserPrivateRoute><Shop /></UserPrivateRoute>} />
@@ -108,6 +112,7 @@ return ( <Router> <Routes>
     <Route path="/admin/products/:id" element={<AdminPrivateRoute><EditProduct /></AdminPrivateRoute>} />
 
   </Routes>
+  </Stairs>
 </Router>
 
 );

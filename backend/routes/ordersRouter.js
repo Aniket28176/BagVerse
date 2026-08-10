@@ -2,7 +2,14 @@ const express = require("express");
 const router = express.Router();
 const isLogin = require("../middlewares/isLogin");
 const Order = require("../models/order.models");
+const Owner = require("../models/owners.models");
 const PDFDocument = require("pdfkit");
+const { sendSms } = require("../utils/smsService");
+
+const isSmsEnabled =
+  !!process.env.TWILIO_ACCOUNT_SID &&
+  !!process.env.TWILIO_AUTH_TOKEN &&
+  !!process.env.TWILIO_PHONE_NUMBER;
 
 /* ===============================
    CREATE ORDER
@@ -31,6 +38,26 @@ router.post("/create", isLogin, async (req, res) => {
       shippingAddress,
     });
 
+    const owner = await Owner.findOne().sort({ createdAt: -1 });
+
+    if (owner && owner.phone && isSmsEnabled) {
+      const customerName = shippingAddress.fullname || "Customer";
+      const customerAddress = [
+        shippingAddress.address,
+        shippingAddress.city,
+        shippingAddress.state,
+        shippingAddress.pincode,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      const messageBody = `New order placed by ${customerName}. Delivery address: ${customerAddress}. Contact: ${shippingAddress.phone}. Total: ₹${totalAmount}.`;
+
+      await sendSms(owner.phone, messageBody);
+    } else {
+      console.info("SMS notification skipped because Twilio is not configured.");
+    }
+
     res.status(201).json({
       message: "Order placed successfully",
       orderId: order._id,
@@ -38,6 +65,27 @@ router.post("/create", isLogin, async (req, res) => {
   } catch (error) {
     console.error("Create order error:", error);
     res.status(500).json({ message: "Failed to place order" });
+  }
+});
+
+/* ===============================
+   GET ADMIN ORDERS
+   GET /api/orders/admin
+   =============================== */
+router.get("/admin", isLogin, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const orders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error("Fetch admin orders error:", error);
+    res.status(500).json({ message: "Failed to fetch admin orders" });
   }
 });
 
@@ -59,6 +107,37 @@ router.get("/my", isLogin, async (req, res) => {
   } catch (error) {
     console.error("Fetch orders error:", error);
     res.status(500).json({ message: "Failed to fetch orders" });
+  }
+});
+
+/* ===============================
+   ACCEPT ORDER
+   PUT /api/orders/:id/accept
+   =============================== */
+router.put("/:id/accept", isLogin, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const { deliveryDate } = req.body;
+    if (!deliveryDate) {
+      return res.status(400).json({ message: "Delivery date is required" });
+    }
+
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = "Accepted";
+    order.deliveryDate = new Date(deliveryDate);
+    await order.save();
+
+    res.status(200).json({ message: "Order accepted", order });
+  } catch (error) {
+    console.error("Accept order error:", error);
+    res.status(500).json({ message: "Failed to accept order" });
   }
 });
 

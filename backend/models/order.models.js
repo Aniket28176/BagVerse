@@ -42,6 +42,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "Placed",
     },
+
+    deliveryDate: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

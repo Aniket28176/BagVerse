@@ -8,6 +8,10 @@ module.exports.registerUser = async (req, res) => {
   try {
     const { fullname, email, password, role } = req.body;
 
+    if (role && role !== "user") {
+      return res.status(403).json({ message: "Owner/admin accounts must be created through owner signup" });
+    }
+
     if (!fullname || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
     }
@@ -17,20 +21,13 @@ module.exports.registerUser = async (req, res) => {
       return res.status(409).json({ message: "Account already exists" });
     }
 
-    // 🔐 ADMIN PROTECTION
-    if (role === "admin") {
-      if (req.body.secret !== process.env.ADMIN_SECRET) {
-        return res.status(403).json({ message: "Unauthorized admin creation" });
-      }
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await userModel.create({
       fullname,
       email,
       password: hashedPassword,
-      role: role || "user",
+      role: "user",
     });
 
     req.session.regenerate((err) => {
