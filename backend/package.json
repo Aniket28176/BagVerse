@@ -10,14 +10,13 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "devDependencies": {
+  "dependencies": {
     "bcrypt": "^6.0.0",
     "config": "^4.1.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "debug": "^4.4.3",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
@@ -26,7 +25,9 @@
     "mongodb": "^7.1.1",
     "mongoose": "^9.0.1",
     "multer": "^2.0.2",
-    "nodemon": "^3.1.11",
     "pdfkit": "^0.17.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }
