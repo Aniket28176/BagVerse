@@ -21,7 +21,6 @@ CORS (DEVELOPMENT ONLY)
 =============================== */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://bagverse-1.onrender.com",
 ];
 
 app.use(
