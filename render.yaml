@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: baggista-backend
+    env: node
+    region: oregon
+    plan: starter
+    branch: main
+    rootDirectory: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://bag-verse-ivory.vercel.app
+# Add your secrets and any additional environment variables in the Render dashboard or via the Render CLI.

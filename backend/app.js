@@ -19,13 +19,17 @@ const ordersRouter = require("./routes/ordersRouter");
 const app = express();
 const appDir = __dirname;
 
+app.set("trust proxy", 1);
+
 // ===============================
 // CORS
 // ===============================
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://bag-verse-chi.vercel.app",
   process.env.FRONTEND_URL,
   process.env.CORS_ORIGIN,
+  "https://bag-verse-ivory.vercel.app",
 ].filter(Boolean);
 
 app.use(
@@ -63,8 +67,8 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
