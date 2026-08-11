@@ -4,6 +4,7 @@ const session = require("express-session");
 const cors = require("cors");
 const MongoStore = require("connect-mongo").default;
 const path = require("path");
+const fs = require("fs");
 
 require("dotenv").config();
 require("./config/mongoose-connection");
@@ -16,7 +17,7 @@ const cartRouter = require("./routes/cartRouter");
 const ordersRouter = require("./routes/ordersRouter");
 
 const app = express();
-const appDir = path.resolve();
+const appDir = __dirname;
 
 // ===============================
 // CORS
@@ -79,13 +80,14 @@ app.use("/api/cart", cartRouter);
 app.use("/api/orders", ordersRouter);
 
 // ===============================
-// SERVE FRONTEND IN PRODUCTION
+// SERVE FRONTEND STATIC ASSETS
 // ===============================
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(appDir, "../frontend/dist")));
+const frontendDist = path.join(appDir, "../frontend/dist");
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist, { index: false, maxAge: 0 }));
 
   app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(appDir, "../frontend/dist/index.html"));
+    res.sendFile(path.join(frontendDist, "index.html"));
   });
 }
 
