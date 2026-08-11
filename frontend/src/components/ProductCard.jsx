@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import { useState } from "react";
 import { COLORS } from "../constants/branding";
 
@@ -15,11 +15,7 @@ const ProductCard = ({ product }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/cart/add`,
-        { productId: product._id },
-        { withCredentials: true }
-      );
+      await api.post("/api/cart/add", { productId: product._id });
       setSuccess("Added to cart!");
       setTimeout(() => setSuccess(""), 2500);
     } catch (err) {

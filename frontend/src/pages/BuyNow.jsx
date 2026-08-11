@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -12,7 +12,7 @@ const BuyNow = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/products/${id}`)
+    api.get(`/api/products/${id}`)
       .then(res => {
         setProduct(res.data);
         setLoading(false);

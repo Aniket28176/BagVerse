@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -69,16 +69,11 @@ const CreateProduct = () => {
 
       data.append("image", image);
 
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/products/create`,
-        data,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await api.post("/api/products/create", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setSuccess("Product created successfully!");
 

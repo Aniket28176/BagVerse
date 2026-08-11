@@ -21,14 +21,22 @@ const appDir = path.resolve();
 // ===============================
 // CORS
 // ===============================
-if (process.env.NODE_ENV !== "production") {
-  app.use(
-    cors({
-      origin: "http://localhost:5173",
-      credentials: true,
-    })
-  );
-}
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+  process.env.CORS_ORIGIN,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error("CORS policy: Origin not allowed"));
+    },
+    credentials: true,
+  })
+);
 
 // ===============================
 // MIDDLEWARE

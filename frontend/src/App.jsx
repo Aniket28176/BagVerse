@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "./utils/api";
 
 /* USER PAGES */
 import Shop from "./pages/Shop";
@@ -17,8 +18,6 @@ import CreateProduct from "./pages/CreateProduct";
 import EditProduct from "./pages/EditProduct";
 import Stairs from "./components/Stairs";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-
 /* ===============================
 USER PROTECTED
 =============================== */
@@ -28,14 +27,9 @@ const [auth, setAuth] = useState(null);
 useEffect(() => {
 const checkAuth = async () => {
 try {
-const res = await fetch(`${API}/api/users/check-auth`, {
-credentials: "include",
-});
+const res = await api.get("/api/users/check-auth");
 
-    if (!res.ok) return setAuth(false);
-
-    const data = await res.json();
-    setAuth(data?.user?.role === "user");
+    setAuth(res?.data?.user?.role === "user");
   } catch {
     setAuth(false);
   }
@@ -58,14 +52,9 @@ const [auth, setAuth] = useState(null);
 useEffect(() => {
 const checkAuth = async () => {
 try {
-const res = await fetch(`${API}/api/users/check-auth`, {
-credentials: "include",
-});
+const res = await api.get("/api/users/check-auth");
 
-    if (!res.ok) return setAuth(false);
-
-    const data = await res.json();
-    setAuth(data?.user?.role === "admin");
+    setAuth(res?.data?.user?.role === "admin");
   } catch {
     setAuth(false);
   }
